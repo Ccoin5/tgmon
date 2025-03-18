@@ -8,6 +8,13 @@ nav button {
     padding: 10px 20px;
     margin: 0 5px;
     cursor: pointer;
+    background-color: #f0f0f0; /* Default button background */
+    border: 1px solid #ccc;
+}
+
+nav button.active {
+    background-color: #e0e0e0; /* Active button background */
+    font-weight: bold; /* Optional: Make active tab text bold */
 }
 
 .tab-content {
