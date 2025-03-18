@@ -1,7 +1,9 @@
         body {
-            margin: 0;
-            font-family: sans-serif;
-            overflow: hidden; /* Prevent scrollbars */
+        margin: 0;
+        font-family: sans-serif;
+        overflow: hidden; /* Prevent scrollbars */
+        background: #222246;
+        padding: 0 0.15rem;
         }
 
         .slider-container {
@@ -43,7 +45,44 @@
             background-color: #e74c3c; /* Red */
         }
 
-        .title-container {
-            text-align: center;
-            padding: 20px;
-        }
+       .title-container {
+            border-radius: 10px;
+            padding: 20px 5px;
+            background: #2587c8;
+   }
+.title-container h1 {
+    color: #01132b;
+    text-transform: uppercase;
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 10px;
+    display: flex;
+    font-size: 20px;
+    width: 135px;
+}
+.title-head {
+    display: flex;
+    padding-left: 5px;
+}
+.title-head h1 {
+    font-size: 20px;
+    color: #fff;
+    text-transform: uppercase;
+    background: #e74c3c;;
+    padding: 8px;
+    border-radius: 10px;
+}
+.title-container p {
+    color: #fff;
+}
+
+element.style {
+}
+.title-container a {
+    color: #fff;
+    padding: 10px 20px;
+    background: #000;
+    border-radius: 5px;
+    font-size: 15px;
+    text-decoration: none;
+  }
