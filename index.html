@@ -1,16 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Telegram Web App</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            overflow: hidden; /* Prevent scrollbars */
+        }
+
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative; /* For absolute positioning of slides */
+        }
+
+        .slider {
+            display: flex; /* Arrange slides horizontally */
+            transition: transform 0.5s ease-in-out; /* Smooth slide transition */
+        }
+
+        .slide {
+            min-width: 100%; /* Each slide takes full width */
+            height: 400px; /* Adjust height as needed */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .slide:nth-child(1) {
+            background-color: #3498db; /* Blue */
+        }
+
+        .slide:nth-child(2) {
+            background-color: #2ecc71; /* Green */
+        }
+
+        .slide:nth-child(3) {
+            background-color: #e74c3c; /* Red */
+        }
+
+        .title-container {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to My Telegram Web App</h1>
-    <p id="user-info">Loading user info...</p>
-    <button id="main-button">Click Me!</button>
-    <script src="script.js"></script>
+
+    <div class="slider-container">
+        <div class="slider" id="slider">
+            <div class="slide">Slide 1</div>
+            <div class="slide">Slide 2</div>
+            <div class="slide">Slide 3</div>
+        </div>
+    </div>
+
+    <div class="title-container">
+        <h1>Welcome to My Telegram App</h1>
+        <p>This is a simple slider example.</p>
+    </div>
+
+    <script>
+        const slider = document.getElementById('slider');
+        let slideIndex = 0;
+
+        function nextSlide() {
+            slideIndex++;
+            if (slideIndex >= slider.children.length) {
+                slideIndex = 0;
+            }
+            updateSlider();
+        }
+
+        function updateSlider() {
+            slider.style.transform = `translateX(-${slideIndex * 100}%)`;
+        }
+
+        setInterval(nextSlide, 3000); // Change slide every 3 seconds
+
+        //Telegram WebApp Initialization
+        window.Telegram.WebApp.ready();
+        //Optional: Send a message to the bot when the app is opened.
+        //window.Telegram.WebApp.sendData("WebApp Opened");
+
+    </script>
+
 </body>
 </html>
