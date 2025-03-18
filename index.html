@@ -1,55 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>VOG Short info</title>
-    <link rel="stylesheet" href="css/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App Tabs</title>
+    <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
+    <nav>
+        <button data-tab="tab1">Tab 1</button>
+        <button data-tab="tab2">Tab 2</button>
+        <button data-tab="tab3">Tab 3</button>
+    </nav>
 
-    <div class="title-head">
-        <h1>Актульно зараз</h1>
-    </div>
-    <div class="slider-container">
-
-        <div class="slider" id="slider">
-            <div class="slide"><img src="img/ban_5.jpg"></div>
-            <div class="slide"><img src="img/ban_7.jpg"></div>
-            <div class="slide">Slide 3</div>
-        </div>
+    <div class="tab-content" id="tab1">
+        <h1>Tab 1 Content</h1>
+        <p>This is the content of tab 1.</p>
     </div>
 
-    <div class="title-container">
-        <h1>VOG-portal</h1>
-        <p>Замовляйте на нашому ююю </p>
-    <a href="#">Перейти</a>
+    <div class="tab-content" id="tab2" style="display: none;">
+        <h1>Tab 2 Content</h1>
+        <p>This is the content of tab 2.</p>
     </div>
 
-    <script>
-        const slider = document.getElementById('slider');
-        let slideIndex = 0;
+    <div class="tab-content" id="tab3" style="display: none;">
+        <h1>Tab 3 Content</h1>
+        <p>This is the content of tab 3.</p>
+    </div>
 
-        function nextSlide() {
-            slideIndex++;
-            if (slideIndex >= slider.children.length) {
-                slideIndex = 0;
-            }
-            updateSlider();
-        }
-
-        function updateSlider() {
-            slider.style.transform = `translateX(-${slideIndex * 100}%)`;
-        }
-
-        setInterval(nextSlide, 6000); // Change slide every 3 seconds
-
-        //Telegram WebApp Initialization
-        window.Telegram.WebApp.ready();
-        //Optional: Send a message to the bot when the app is opened.
-        //window.Telegram.WebApp.sendData("WebApp Opened");
-
-    </script>
-
+    <script src="script.js"></script>
 </body>
 </html>
