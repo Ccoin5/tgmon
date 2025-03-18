@@ -24,7 +24,7 @@
 
         .slide {
             min-width: 100%; /* Each slide takes full width */
-            height: 400px; /* Adjust height as needed */
+          
             display: flex;
             justify-content: center;
             align-items: center;
