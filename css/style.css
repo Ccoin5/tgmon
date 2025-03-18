@@ -1,1 +1,46 @@
+ <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+            overflow: hidden; /* Prevent scrollbars */
+        }
 
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+            position: relative; /* For absolute positioning of slides */
+        }
+
+        .slider {
+            display: flex; /* Arrange slides horizontally */
+            transition: transform 0.5s ease-in-out; /* Smooth slide transition */
+        }
+
+        .slide {
+            min-width: 100%; /* Each slide takes full width */
+            height: 400px; /* Adjust height as needed */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .slide:nth-child(1) {
+            background-url: #3498db; /* Blue */
+        }
+
+        .slide:nth-child(2) {
+            background-color: #2ecc71; /* Green */
+        }
+
+        .slide:nth-child(3) {
+            background-color: #e74c3c; /* Red */
+        }
+
+        .title-container {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
