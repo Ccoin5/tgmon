@@ -8,7 +8,11 @@
 </head>
 <body>
 
+    <div class="title-head">
+        <h1>Актульно зараз</h1>
+    </div>
     <div class="slider-container">
+
         <div class="slider" id="slider">
             <div class="slide"><img src="img/ban_5.jpg"></div>
             <div class="slide"><img src="img/ban_7.jpg"></div>
@@ -17,8 +21,9 @@
     </div>
 
     <div class="title-container">
-        <h1>Welcome to My Telegram App</h1>
-        <p>This is a simple slider example.</p>
+        <h1>VOG-portal</h1>
+        <p>Замовляйте на нашому ююю </p>
+    <a href="#">Перейти</a>
     </div>
 
     <script>
@@ -37,7 +42,7 @@
             slider.style.transform = `translateX(-${slideIndex * 100}%)`;
         }
 
-        setInterval(nextSlide, 3000); // Change slide every 3 seconds
+        setInterval(nextSlide, 6000); // Change slide every 3 seconds
 
         //Telegram WebApp Initialization
         window.Telegram.WebApp.ready();
