@@ -1,0 +1,444 @@
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Button } from '@/components/ui/button';
+import {  Gamepad2, Play, Wallet, AlertTriangle } from 'lucide-react';
+import { cn } from "@/lib/utils"
+
+// Game Constants
+const GRID_SIZE = 20;
+const CANVAS_SIZE = 400;
+const SNAKE_COLOR = '#00FF00';  // Green
+const FOOD_COLOR = '#FF006E';    // Pink
+const BACKGROUND_COLOR = '#111827'; // Dark background - for tailwind
+const WALL_COLOR = '#A78BFA'; // Purple for walls
+const INITIAL_GAME_SPEED = 200;
+const SPEED_INCREMENT = 20;
+const MAX_LEVEL = 5;
+
+// Helper Functions
+const generateFood = (gridSize: number, snake: { x: number; y: number }[], walls: { x: number; y: number }[]): { x: number; y: number } => {
+    let food;
+    while (true) {
+        food = {
+            x: Math.floor(Math.random() * gridSize),
+            y: Math.floor(Math.random() * gridSize),
+        };
+        // Ensure food doesn't spawn inside the snake or walls
+        let isInsideSnakeOrWall = false;
+        for (const segment of snake) {
+            if (segment.x === food.x && segment.y === food.y) {
+                isInsideSnakeOrWall = true;
+                break;
+            }
+        }
+        if (!isInsideSnakeOrWall) {
+            for (const wall of walls) {
+                if (wall.x === food.x && wall.y === food.y) {
+                    isInsideSnakeOrWall = true;
+                    break;
+                }
+            }
+        }
+        if (!isInsideSnakeOrWall) break;
+    }
+    return food;
+};
+
+const generateWalls = (level: number, gridSize: number): { x: number; y: number }[] => {
+    const numWalls = level; // Walls equal to level number
+    const walls = [];
+    for (let i = 0; i < numWalls; i++) {
+        walls.push({
+            x: Math.floor(Math.random() * gridSize),
+            y: Math.floor(Math.random() * gridSize),
+        });
+    }
+    return walls;
+};
+
+// Mock Razor Wallet connection
+const connectRazorWallet = async (): Promise<string | null> => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const connected = true;
+            if (connected) {
+                resolve("0xUserWalletAddress");
+            } else {
+                reject("Failed to connect to Razor Wallet");
+            }
+        }, 1500);
+    });
+};
+
+const Game = () => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [snake, setSnake] = useState<{ x: number; y: number }[]>([{ x: 10, y: 10 }]);
+    const [food, setFood] = useState<{ x: number; y: number }>(generateFood(GRID_SIZE, [{x: 10, y:10}], []));
+    const [direction, setDirection] = useState<'up' | 'down' | 'left' | 'right'>('right');
+    const [gameOver, setGameOver] = useState(false);
+    const [gameStarted, setGameStarted] = useState(false);
+    const [score, setScore] = useState(0);
+    const [level, setLevel] = useState(1);
+    const [gameSpeed, setGameSpeed] = useState(INITIAL_GAME_SPEED);
+    const gameLoopRef = useRef<number>();
+    const [walletAddress, setWalletAddress] = useState<string | null>(null);
+    const [loadingWallet, setLoadingWallet] = useState(false);
+    const previousDirectionRef = useRef<string>('right');
+    const [moveSnake, setMoveSnake] = useState(false);
+    const [walls, setWalls] = useState<{ x: number; y: number }[]>(generateWalls(1, GRID_SIZE));
+    const [selectedLevel, setSelectedLevel] = useState(1); // Add selected level state
+    const [intervalId, setIntervalId] = useState<number | null>(null);
+
+
+    // Game Over Check
+    const isGameOver = useCallback((snakeHead: { x: number; y: number }, currentSnake: { x: number; y: number }[], currentWalls: { x: number; y: number }[]) => {
+        // Wall collision check
+        for (const wall of currentWalls) {
+            if (snakeHead.x === wall.x && snakeHead.y === wall.y) {
+                return true;
+            }
+        }
+        // Self-collision check
+        for (let i = 1; i < currentSnake.length; i++) {
+            if (snakeHead.x === currentSnake[i].x && snakeHead.y === currentSnake[i].y) {
+                return true;
+            }
+        }
+        return false;
+    }, []);
+
+    // Main Game Loop
+    const gameLoop = useCallback(() => {
+        if (gameOver) return;
+
+        setSnake((prevSnake) => {
+            const head = { x: prevSnake[0].x, y: prevSnake[0].y };
+
+            switch (direction) {
+                case 'up':
+                    head.y -= 1;
+                    break;
+                case 'down':
+                    head.y += 1;
+                    break;
+                case 'left':
+                    head.x -= 1;
+                    break;
+                case 'right':
+                    head.x += 1;
+                    break;
+            }
+
+            // Wrap around logic
+            if (head.x >= GRID_SIZE) {
+                head.x = 0;
+            } else if (head.x < 0) {
+                head.x = GRID_SIZE - 1;
+            }
+            if (head.y >= GRID_SIZE) {
+                head.y = 0;
+            } else if (head.y < 0) {
+                head.y = GRID_SIZE - 1;
+            }
+
+            if (isGameOver(head, prevSnake, walls)) {
+                setGameOver(true);
+                setGameStarted(false);
+                setMoveSnake(false);
+                if (gameLoopRef.current) {
+                    clearInterval(gameLoopRef.current);
+                }
+                return prevSnake;
+            }
+
+            let newSnake = [head, ...prevSnake.slice(0, -1)];
+
+            if (head.x === food.x && head.y === food.y) {
+                setFood(generateFood(GRID_SIZE, newSnake, walls));
+                setScore(currentScore => currentScore + 10);
+                newSnake = [head, ...prevSnake];
+
+                if (score % 50 === 0 && level < MAX_LEVEL) {
+                    setLevel(prevLevel => prevLevel + 1);
+                    setGameSpeed(prevSpeed => prevSpeed - SPEED_INCREMENT);
+                }
+            }
+            return newSnake;
+        });
+    }, [direction, food, gameOver, isGameOver, level, score, walls]);
+
+    // Drawing function
+    const draw = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        ctx.fillStyle = BACKGROUND_COLOR;
+        ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+
+        // Draw snake
+        snake.forEach((segment) => {
+            ctx.fillStyle = SNAKE_COLOR;
+            ctx.fillRect(
+                segment.x * GRID_SIZE,
+                segment.y * GRID_SIZE,
+                GRID_SIZE,
+                GRID_SIZE
+            );
+        });
+
+        // Draw food
+        ctx.fillStyle = FOOD_COLOR;
+        ctx.fillRect(food.x * GRID_SIZE, food.y * GRID_SIZE, GRID_SIZE, GRID_SIZE);
+
+        // Draw walls
+        walls.forEach(wall => {
+            ctx.fillStyle = WALL_COLOR;
+            ctx.fillRect(
+                wall.x * GRID_SIZE,
+                wall.y * GRID_SIZE,
+                GRID_SIZE,
+                GRID_SIZE
+            );
+        });
+
+        if (gameOver) {
+            ctx.fillStyle = '#DC2626';
+            ctx.font = '30px "Press Start 2P", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Game Over', CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+            ctx.fillStyle = '#B91C1C';
+            ctx.font = '20px "Press Start 2P", monospace';
+            ctx.fillText(`Score: ${score}`, CANVAS_SIZE / 2, CANVAS_SIZE / 2 + 40);
+            ctx.fillText(`Level: ${level}`, CANVAS_SIZE / 2, CANVAS_SIZE / 2 + 70);
+        }
+        if (!gameStarted) {
+            ctx.fillStyle = '#F5F5F5';
+            ctx.font = '24px "Press Start 2P", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('Select Level and Press Start', CANVAS_SIZE / 2, CANVAS_SIZE / 2);
+        }
+
+    }, [snake, food, gameOver, gameStarted, score, level, walls]);
+
+    // Set up game interval
+    useEffect(() => {
+        if (gameStarted && !gameOver && moveSnake) {
+            const intervalId = setInterval(gameLoop, gameSpeed);
+            setIntervalId(intervalId);
+        }
+
+        return () => {
+            if (intervalId) {
+                clearInterval(intervalId);
+                setIntervalId(null);
+            }
+        };
+    }, [gameStarted, gameOver, gameLoop, gameSpeed, moveSnake]);
+
+    // Initial draw
+    useEffect(() => {
+        draw();
+    }, [draw]);
+
+    // Handle keyboard input
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (gameOver) return;
+            if (!gameStarted) return;
+
+            let newDirection = direction;
+            switch (e.key) {
+                case 'ArrowUp':
+                    if (direction !== 'down') newDirection = 'up';
+                    break;
+                case 'ArrowDown':
+                    if (direction !== 'up') newDirection = 'down';
+                    break;
+                case 'ArrowLeft':
+                    if (direction !== 'right') newDirection = 'left';
+                    break;
+                case 'ArrowRight':
+                    if (direction !== 'left') newDirection = 'right';
+                    break;
+            }
+
+            // Check for rapid direction change
+            if (
+                (previousDirectionRef.current === 'up' && newDirection === 'down') ||
+                (previousDirectionRef.current === 'down' && newDirection === 'up') ||
+                (previousDirectionRef.current === 'left' && newDirection === 'right') ||
+                (previousDirectionRef.current === 'right' && newDirection === 'left')
+            ) {
+                setGameSpeed(prevSpeed => {
+                    const newSpeed = prevSpeed / 1.5;
+                    return Math.max(50, newSpeed);
+                });
+            } else {
+                setGameSpeed(INITIAL_GAME_SPEED - (level - 1) * SPEED_INCREMENT);
+            }
+
+            previousDirectionRef.current = newDirection;
+            setDirection(newDirection);
+            setMoveSnake(true);
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [direction, gameOver, gameStarted, level]);
+
+      const handleStartPause = () => {
+        if (gameOver) {
+            setGameStarted(true);
+            setGameOver(false);
+            setSnake([{ x: 10, y: 10 }]);
+            setFood(generateFood(GRID_SIZE, [{ x: 10, y: 10 }], []));
+            setDirection('right');
+            setScore(0);
+            setLevel(selectedLevel);
+            setGameSpeed(INITIAL_GAME_SPEED);
+            setMoveSnake(true); // Start moving on restart as well
+            setWalls(generateWalls(selectedLevel, GRID_SIZE));
+        } else if (!gameStarted) {
+            setGameStarted(true);
+            setMoveSnake(false);
+            setLevel(selectedLevel);
+            setWalls(generateWalls(selectedLevel, GRID_SIZE));
+        } else {
+            setMoveSnake(prev => !prev);
+        }
+    };
+
+    // Connect Wallet Function
+    const handleConnectWallet = async () => {
+        setLoadingWallet(true);
+        try {
+            const address = await connectRazorWallet();
+            if (address) {
+                setWalletAddress(address);
+            }
+        } catch (error) {
+            console.error("Failed to connect wallet:", error);
+            setWalletAddress(null);
+        } finally {
+            setLoadingWallet(false);
+        }
+    };
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+            <div className="bg-gray-800 p-4 rounded-xl shadow-lg border border-gray-700 space-y-4">
+                <h1 className="text-3xl font-bold text-white text-center bg-gradient-to-r from-green-400 to-pink-500 text-transparent bg-clip-text">
+                    Snake Game
+                </h1>
+                <div className="text-center text-white text-xl font-mono">
+                    Score: {score}  Level: {level}
+                </div>
+                <canvas
+                    ref={canvasRef}
+                    width={CANVAS_SIZE}
+                    height={CANVAS_SIZE}
+                    className="border-4 border-gray-700 rounded-lg"
+                    style={{ backgroundColor: BACKGROUND_COLOR }}
+                />
+
+                <div className="flex justify-center gap-4 mt-4 flex-col items-center">
+                    {walletAddress ? (
+                        <div className="text-green-400 text-sm font-mono">
+                            Connected: {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}
+                        </div>
+                    ) : (
+                        <Button
+                            onClick={handleConnectWallet}
+                            disabled={loadingWallet}
+                            className="px-6 py-3 rounded-full text-white font-semibold transition-all duration-300 bg-blue-500 hover:bg-blue-600"
+                        >
+                            {loadingWallet ? (
+                                <>
+                                    <svg
+                                        className="animate-spin h-5 w-5 mr-3"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <circle
+                                            className="opacity-25"
+                                            cx="12"
+                                            cy="12"
+                                            r="10"
+                                            stroke="currentColor"
+                                            strokeWidth="4"
+                                        ></circle>
+                                        <path
+                                            className="opacity-75"
+                                            fill="currentColor"
+                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                        ></path>
+                                    </svg>
+                                    Connecting...
+                                </>
+                            ) : (
+                                <>
+                                    <Wallet className="mr-2 h-5 w-5" /> Connect Razor Wallet
+                                </>
+                            )}
+                        </Button>
+                    )}
+                    <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((levelOption) => (
+                            <Button
+                                key={levelOption}
+                                variant={selectedLevel === levelOption ? "default" : "outline"}
+                                onClick={() => setSelectedLevel(levelOption)}
+                                className={cn(
+                                    "rounded-full text-white font-semibold transition-all duration-200",
+                                    selectedLevel === levelOption
+                                        ? "bg-purple-500 text-white"
+                                        : "text-gray-400 hover:bg-gray-700 hover:text-white"
+                                )}
+                            >
+                                {levelOption}
+                            </Button>
+                        ))}
+                    </div>
+                    {!gameStarted && (
+                        <Button
+                            onClick={handleStartPause}
+                            className={cn(
+                                "px-6 py-3 rounded-full text-white font-semibold transition-all duration-300",
+                                "bg-blue-500 hover:bg-blue-600"
+                            )}
+                        >
+                            <>
+                                <Play className="mr-2 h-5 w-5" /> Start
+                            </>
+                        </Button>
+                    )}
+                     {gameStarted && (
+                        <Button
+                            onClick={handleStartPause}
+                            className={cn(
+                                "px-6 py-3 rounded-full text-white font-semibold transition-all duration-300",
+                                "bg-yellow-500 hover:bg-yellow-600"
+                            )}
+                        >
+                            {moveSnake ? 'Pause' : 'Continue'}
+                        </Button>
+                    )}
+                    <p className="text-gray-400 text-sm">
+                        Use Arrow Keys for control snake
+                    </p>
+                </div>
+            </div>
+            <div className="mt-6 text-gray-400 text-center text-sm flex items-center gap-1">
+                <Gamepad2 className="inline-block h-4 w-4 mr-1" />
+                Use arrow keys or D-pad to control the snake.
+            </div>
+        </div>
+    );
+};
+
+export default Game;
+
