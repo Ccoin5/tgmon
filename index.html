@@ -3,302 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dice Game</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background-color: #1a1a1a;
-            color: #fff;
-            margin: 0;
-            padding: 20px;
-            position: relative;
-        }
-
-        .game-container {
-            text-align: center;
-            background-color: #2d2d2d;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            width: 350px;
-        }
-
-        #dice-result {
-            font-size: 3em;
-            margin-bottom: 20px;
-            color: #ff751a;
-            min-height: 40px;
-            font-weight: bold;
-        }
-
-        button {
-            padding: 12px 25px;
-            font-size: 18px;
-            background-color: #ff751a;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        button:hover {
-            background-color: #e65100;
-        }
-
-        button:disabled {
-            background-color: #888;
-            cursor: not-allowed;
-            opacity: 0.6;
-            box-shadow: none;
-        }
-
-        .bet-buttons {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .bet-button {
-            padding: 10px 18px;
-            font-size: 16px;
-            background-color: #3b3b3b;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background-color 0.3s ease;
-            box-shadow: none;
-        }
-
-        .bet-button:hover {
-            background-color: #4a4a4a;
-        }
-
-        .bet-button.selected {
-            background-color: #ff751a;
-            color: #fff;
-            box-shadow: 0 0 5px #fff;
-        }
-
-        .bet-button:disabled {
-            background-color: #888;
-            cursor: not-allowed;
-            opacity: 0.6;
-            box-shadow: none;
-        }
-
-        .input-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        #number-input {
-            padding: 10px;
-            width: 120px;
-            border-radius: 8px;
-            border: 1px solid #555;
-            background-color: #222;
-            color: #fff;
-            margin-top: 10px;
-            font-size: 16px;
-            display: none;
-        }
-
-        .number-buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            gap: 5px;
-        }
-
-        .number-button {
-            padding: 10px 15px;
-            font-size: 16px;
-            background-color: #3b3b3b;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin: 5px;
-            transition: background-color 0.3s ease;
-            box-shadow: none;
-        }
-
-        .number-button:hover {
-            background-color: #4a4a4a;
-        }
-
-        .number-button.selected {
-            background-color: #ff751a;
-            color: #fff;
-            box-shadow: 0 0 5px #fff;
-        }
-
-        .message {
-            font-size: 1.4em;
-            color: #fff;
-            margin-bottom: 20px;
-            min-height: 30px;
-            font-weight: bold;
-        }
-
-        .label {
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #aaa;
-        }
-
-        #how-to-play {
-            margin-top: 10px;
-            font-size: 0.8em;
-            color: #888;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.5);
-        }
-
-        .modal-content {
-            background-color: #2d2d2d;
-            color: #fff;
-            margin: 15% auto;
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid #555;
-            width: 90%;
-            max-width: 400px;
-            position: relative;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            text-align: center;
-        }
-
-        .modal-title {
-            font-size: 2em;
-            color: #ff751a;
-            margin-bottom: 15px;
-        }
-
-        .modal-text {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        .modal-button {
-            padding: 12px 25px;
-            font-size: 18px;
-            background-color: #ff751a;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-button:hover {
-            background-color: #e65100;
-        }
-
-        #connect-wallet {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 12px 25px;
-            font-size: 18px;
-            background-color: #4CAF50;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-        }
-
-        #connect-wallet:hover {
-            background-color: #45a049;
-        }
-
-        #disconnect-wallet {
-            position: absolute;
-            top: 20px;
-            right: 150px;
-            padding: 12px 25px;
-            font-size: 18px;
-            background-color: #f44336;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            display: none;
-        }
-
-        #disconnect-wallet:hover {
-            background-color: #d32f2f;
-        }
-
-        #network-info {
-            display: none;
-            margin-top: 20px;
-            text-align: left;
-            padding: 15px;
-            border: 1px solid #555;
-            border-radius: 8px;
-            background-color: #222;
-            width: 90%;
-            max-width: 400px;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        #network-info h3 {
-            font-size: 1.2em;
-            color: #ff751a;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        #network-info p {
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        #network-info a {
-            color: #42a5f5;
-            text-decoration: none;
-        }
-
-        #network-info a:hover {
-            text-decoration: underline;
-        }
-
-    </style>
+    <title>Dice Game on Somnia</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <script>
+    // Check if window.ethereum is available
+    if (typeof window.ethereum === 'undefined') {
+        alert('MetaMask or a compatible wallet is not installed.  This game requires a web3 wallet.');
+    }
+    </script>
 </head>
 <body>
     <div class="game-container">
@@ -317,12 +31,12 @@
             <button id="roll-button">Roll Dice</button>
         </div>
         <div class="bet-buttons">
-            <button class="bet-button" data-bet="0.01">0.01 SST</button>
-            <button class="bet-button" data-bet="0.02">0.02 SST</button>
-            <button class="bet-button" data-bet="0.05">0.05 SST</button>
-            <button class="bet-button" data-bet="0.1">0.1 SST</button>
-            <button class="bet-button" data-bet="0.5">0.5 SST</button>
-            <button class="bet-button" data-bet="1">1 SST</button>
+            <button class="bet-button" data-bet="0.01">0.01 STT</button>
+            <button class="bet-button" data-bet="0.02">0.02 STT</button>
+            <button class="bet-button" data-bet="0.05">0.05 STT</button>
+            <button class="bet-button" data-bet="0.1">0.1 STT</button>
+            <button class="bet-button" data-bet="0.5">0.5 STT</button>
+            <button class="bet-button" data-bet="1">1 STT</button>
         </div>
         <p id="game-message" class="message"></p>
         <button id="connect-wallet">Connect Wallet</button>
@@ -347,6 +61,28 @@
         <p><strong>Alternative Block Explorer:</strong> <a href="https://somnia-testnet.socialscan.io/" target="_blank">SocialScan</a></p>
     </div>
 
+    <div id="wallet-modal" class="wallet-modal">
+        <div class="wallet-modal-content">
+            <h2 class="wallet-modal-title">Connect Wallet</h2>
+            <button class="wallet-button" id="metamask-connect">
+                <img src="https://metamask.github.io/metamask-logo/v1/Favicon/favicon-32x32.png" alt="MetaMask">
+                MetaMask
+            </button>
+            <button class="wallet-button" id="rabby-connect">
+                <img src="https://rabby.io/favicon.ico" alt="Rabby">
+                Rabby
+            </button>
+        </div>
+    </div>
+
+    <div id="sign-in-modal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title" id="sign-in-title">Sign In</h2>
+            <p class="modal-text" id="sign-in-text">Please sign in with your selected wallet to authorize connection to Somnia Testnet.</p>
+            <button id="sign-in-button" class="modal-button">Sign In</button>
+        </div>
+    </div>
+
     <script>
         const diceResult = document.getElementById('dice-result');
         const rollButton = document.getElementById('roll-button');
@@ -362,6 +98,13 @@
         const connectWalletButton = document.getElementById('connect-wallet');
         const disconnectWalletButton = document.getElementById('disconnect-wallet');
         const networkInfo = document.getElementById('network-info');
+        const walletModal = document.getElementById('wallet-modal');
+        const metamaskConnectButton = document.getElementById('metamask-connect');
+        const rabbyConnectButton = document.getElementById('rabby-connect');
+        const signInModal = document.getElementById('sign-in-modal');
+        const signInButton = document.getElementById('sign-in-button');
+        const signInTitle = document.getElementById('sign-in-title');
+        const signInText = document.getElementById('sign-in-text');
 
         let attemptsLeft = 1;
         let targetNumber;
@@ -371,6 +114,10 @@
         let userGuesses = [];
         let chosenNumber = 0;
         let walletConnected = false;
+        let selectedWallet = null;
+        let signedIn = false;
+        const somniaChainId = '50312'; // Somnia Testnet Chain ID
+        const somniaRpcUrl = 'https://dream-rpc.somnia.network/';
 
         // Disable game buttons initially
         betButtons.forEach(button => {
@@ -438,12 +185,12 @@
             userGuesses.push(userGuess);
 
             // Simulate transaction and fee payment
-            console.log(`Simulating transaction on Somnia Testnet for ${selectedBet} SST...`);
+            console.log(`Simulating transaction on Somnia Testnet for ${selectedBet} STT using ${selectedWallet}...`);
             console.log("Simulating fee payment...");
 
             if (currentRoll === targetNumber && userGuess === targetNumber) {
                 modalTitle.textContent = "Congratulations!";
-                modalText.textContent = `You guessed correctly and won ${selectedBet * 2} SST!  The target number was ${targetNumber}. Your guess was ${userGuess}.`;
+                modalText.textContent = `You guessed correctly and won ${selectedBet * 2} STT!  The target number was ${targetNumber}. Your guess was ${userGuess}.`;
                 modal.style.display = "block";
                 rollButton.disabled = true;
                 resetGame();
@@ -497,11 +244,211 @@
         }
 
         connectWalletButton.addEventListener('click', function() {
-            // Simulate connecting to a wallet and Somnia Testnet
-            console.log("Connecting to wallet and Somnia Testnet...");
-            walletConnected = true; // For demo purposes, set to true
-            gameMessage.textContent = "Wallet connected! You can now play.";
-            // Enable game buttons after connecting wallet
+            walletModal.style.display = 'flex';
+        });
+
+        metamaskConnectButton.addEventListener('click', async function() {
+            selectedWallet = 'MetaMask';
+            walletModal.style.display = 'none';
+            try {
+                await connectToMetaMask();
+            } catch (error) {
+                console.error("MetaMask Connection Error:", error);
+                gameMessage.textContent = "Failed to connect to MetaMask. Please try again.";
+                walletConnected = false;
+            }
+        });
+
+        rabbyConnectButton.addEventListener('click', async function() {
+            selectedWallet = 'Rabby';
+            walletModal.style.display = 'none';
+            try{
+                await connectToRabby();
+            } catch(error) {
+                console.error("Rabby Connection Error:", error);
+                gameMessage.textContent = "Failed to connect to Rabby. Please try again.";
+                walletConnected = false;
+            }
+
+        });
+
+
+
+        async function connectToMetaMask() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    // Request account access
+                    const accounts = await provider.send("eth_requestAccounts", []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+
+                    // Check network
+                    const network = await provider.getNetwork();
+                    if (network.chainId.toString() === somniaChainId) {
+                        walletConnected = true;
+                        signedIn = true;
+                        gameMessage.textContent = `MetaMask connected to Somnia Testnet!  Address: ${address}.  You can now play.`;
+                        enableGameButtons();
+                        connectWalletButton.style.display = 'none';
+                        disconnectWalletButton.style.display = 'inline-block';
+                    } else {
+                         // Switch network
+                        try {
+                            await provider.send('wallet_switchEthereumChain', [{ chainId: '0x' + parseInt(somniaChainId).toString(16) }]);
+                            const network = await provider.getNetwork();
+                            if(network.chainId.toString() === somniaChainId){
+                                walletConnected = true;
+                                signedIn = true;
+                                gameMessage.textContent = `MetaMask connected to Somnia Testnet! You can now play.`;
+                                enableGameButtons();
+                                connectWalletButton.style.display = 'none';
+                                disconnectWalletButton.style.display = 'inline-block';
+                            }
+                        } catch (switchError) {
+                            if (switchError.code === 4902) {
+                                // Add network if not present
+                                try {
+                                    await provider.send(
+                                        'wallet_addEthereumChain',
+                                        [{
+                                            chainId: '0x' + parseInt(somniaChainId).toString(16),
+                                            chainName: 'Somnia Testnet',
+                                            nativeCurrency: {
+                                                name: 'STT',
+                                                symbol: 'STT',
+                                                decimals: 18
+                                            },
+                                            rpcUrls: [somniaRpcUrl],
+                                            blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
+                                        }]
+                                    );
+                                    const network = await provider.getNetwork();
+                                    if(network.chainId.toString() === somniaChainId){
+                                         walletConnected = true;
+                                         signedIn = true;
+                                         gameMessage.textContent = `MetaMask connected to Somnia Testnet! You can now play.`;
+                                         enableGameButtons();
+                                         connectWalletButton.style.display = 'none';
+                                         disconnectWalletButton.style.display = 'inline-block';
+                                    }
+
+                                } catch (addError) {
+                                    console.error("Failed to add Somnia network:", addError);
+                                    gameMessage.textContent = "Failed to add Somnia Testnet to MetaMask. Please add the network manually.";
+                                    walletConnected = false;
+                                    signedIn = false;
+                                }
+                            } else {
+                                console.error("Failed to switch to Somnia network:", switchError);
+                                gameMessage.textContent = "Wrong network. Please connect to Somnia Testnet in your MetaMask.";
+                                walletConnected = false;
+                                signedIn = false;
+                            }
+                        }
+                    }
+
+
+                } catch (err) {
+                    console.error("Error connecting to MetaMask:", err);
+                    gameMessage.textContent = "Failed to connect to MetaMask. Please try again.";
+                    walletConnected = false;
+                    signedIn = false;
+                }
+            } else {
+                gameMessage.textContent = "MetaMask is not installed. Please install MetaMask and try again.";
+                walletConnected = false;
+                signedIn = false;
+            }
+        }
+
+        async function connectToRabby() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const provider = new ethers.providers.Web3Provider(window.ethereum);
+                    const accounts = await provider.send("eth_requestAccounts", []);
+                    const signer = provider.getSigner();
+                    const address = await signer.getAddress();
+
+                    // Check network
+                    const network = await provider.getNetwork();
+                    if (network.chainId.toString() === somniaChainId) {
+                        walletConnected = true;
+                        signedIn = true;
+                        gameMessage.textContent = `Rabby connected to Somnia Testnet! Address: ${address}. You can now play.`;
+                        enableGameButtons();
+                        connectWalletButton.style.display = 'none';
+                        disconnectWalletButton.style.display = 'inline-block';
+                    } else {
+                         // Switch network
+                        try {
+                            await provider.send('wallet_switchEthereumChain', [{ chainId: '0x' + parseInt(somniaChainId).toString(16) }]);
+                             const network = await provider.getNetwork();
+                            if(network.chainId.toString() === somniaChainId){
+                                 walletConnected = true;
+                                 signedIn = true;
+                                 gameMessage.textContent = `Rabby connected to Somnia Testnet!  You can now play.`;
+                                 enableGameButtons();
+                                 connectWalletButton.style.display = 'none';
+                                 disconnectWalletButton.style.display = 'inline-block';
+                            }
+                        } catch (switchError) {
+                            if (switchError.code === 4902) {
+                                // Add network if not present
+                                try {
+                                     await provider.send(
+                                        'wallet_addEthereumChain',
+                                        [{
+                                            chainId: '0x' + parseInt(somniaChainId).toString(16),
+                                            chainName: 'Somnia Testnet',
+                                            nativeCurrency: {
+                                                name: 'STT',
+                                                symbol: 'STT',
+                                                decimals: 18
+                                            },
+                                            rpcUrls: [somniaRpcUrl],
+                                            blockExplorerUrls: ['https://shannon-explorer.somnia.network/']
+                                        }]
+                                    );
+                                    const network = await provider.getNetwork();
+                                    if(network.chainId.toString() === somniaChainId){
+                                         walletConnected = true;
+                                         signedIn = true;
+                                         gameMessage.textContent = `Rabby connected to Somnia Testnet! You can now play.`;
+                                         enableGameButtons();
+                                         connectWalletButton.style.display = 'none';
+                                         disconnectWalletButton.style.display = 'inline-block';
+                                    }
+
+                                } catch (addError) {
+                                    console.error("Failed to add Somnia network:", addError);
+                                    gameMessage.textContent = "Failed to add Somnia Testnet to Rabby. Please add the network manually.";
+                                    walletConnected = false;
+                                    signedIn = false;
+                                }
+                            } else {
+                                console.error("Failed to switch to Somnia network:", switchError);
+                                gameMessage.textContent = "Wrong network. Please connect to Somnia Testnet in your Rabby.";
+                                walletConnected = false;
+                                signedIn = false;
+                            }
+                        }
+                    }
+
+                } catch (err) {
+                    console.error("Error connecting to Rabby:", err);
+                    gameMessage.textContent = "Failed to connect to Rabby. Please try again.";
+                    walletConnected = false;
+                    signedIn = false;
+                }
+            } else {
+                gameMessage.textContent = "Rabby or a compatible wallet is not installed. Please install a wallet and try again.";
+                walletConnected = false;
+                signedIn = false;
+            }
+        }
+
+        function enableGameButtons() {
             betButtons.forEach(button => {
                 button.disabled = false;
             });
@@ -509,15 +456,15 @@
                 button.disabled = false;
             });
             rollButton.disabled = false;
-            connectWalletButton.style.display = 'none';
-            disconnectWalletButton.style.display = 'inline-block';
-        });
+        }
 
         disconnectWalletButton.addEventListener('click', function() {
             console.log("Disconnecting Wallet");
             walletConnected = false;
+            selectedWallet = null;
+            signedIn = false;
             gameMessage.textContent = "Wallet disconnected! Connect to play.";
-             betButtons.forEach(button => {
+            betButtons.forEach(button => {
                 button.disabled = true;
             });
             numberButtons.forEach(button => {
