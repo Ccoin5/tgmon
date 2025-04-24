@@ -112,6 +112,38 @@
             color: #fff;
             margin-top: 10px;
             font-size: 16px;
+            display: none; /* Hide the input field */
+        }
+
+        .number-buttons { /* New container for number buttons */
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            gap: 5px;
+        }
+
+        .number-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #3b3b3b;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background-color 0.3s ease;
+            box-shadow: none;
+        }
+
+        .number-button:hover {
+            background-color: #4a4a4a;
+        }
+
+        .number-button.selected {
+            background-color: #ff751a;
+            color: #fff;
+            box-shadow: 0 0 5px #fff;
         }
 
         .message {
@@ -196,8 +228,15 @@
     <div class="game-container">
         <p id="dice-result">Roll the dice!</p>
         <div class="input-container">
-            <label for="number-input" class="label">Choose a number (1-10):</label>
-            <input type="number" id="number-input" min="1" max="10">
+            <label for="number-input" class="label">Choose a number (1-5):</label>
+            <div class="number-buttons">
+                <button class="number-button" data-number="1">1</button>
+                <button class="number-button" data-number="2">2</button>
+                <button class="number-button" data-number="3">3</button>
+                <button class="number-button" data-number="4">4</button>
+                <button class="number-button" data-number="5">5</button>
+            </div>
+            <input type="number" id="number-input" min="1" max="5">
             <a id="how-to-play" href="#">How to Play</a>
             <button id="roll-button">Roll Dice</button>
         </div>
@@ -226,16 +265,20 @@
         const numberInput = document.getElementById('number-input');
         const gameMessage = document.getElementById('game-message');
         const betButtons = document.querySelectorAll('.bet-button');
+        const numberButtons = document.querySelectorAll('.number-button'); // Get number buttons
         const howToPlayLink = document.getElementById('how-to-play');
         const modal = document.getElementById('result-modal');
         const modalTitle = document.getElementById('modal-title');
         const modalText = document.getElementById('modal-text');
         const modalButton = document.getElementById('modal-button');
 
-        let attemptsLeft = 2;
+        let attemptsLeft = 1;
         let targetNumber;
         let selectedBet = 0;
         let gameStarted = false;
+        let currentRolls = [];
+        let userGuesses = [];
+        let chosenNumber = 0; // Store the selected number
 
         betButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -247,33 +290,50 @@
             });
         });
 
+        numberButtons.forEach(button => { // Add event listeners to number buttons
+            button.addEventListener('click', function() {
+                if (!gameStarted) {
+                    chosenNumber = parseInt(this.dataset.number);
+                    numberButtons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    numberInput.value = chosenNumber; // Update hidden input
+                }
+            });
+        });
+
         rollButton.addEventListener('click', function() {
             if (selectedBet === 0) {
                 gameMessage.textContent = "Please select a bet amount.";
                 return;
             }
 
-            if (!numberInput.value || parseInt(numberInput.value) < 1 || parseInt(numberInput.value) > 10) {
-                gameMessage.textContent = "Please enter a valid number from 1 to 10.";
+            if (chosenNumber === 0) { // Check if a number has been chosen
+                gameMessage.textContent = "Please choose a number.";
                 return;
             }
 
-            if (attemptsLeft === 2) {
-                targetNumber = Math.floor(Math.random() * 10) + 1;
+            if (attemptsLeft === 1) {
+                targetNumber = Math.floor(Math.random() * 5) + 1;
                 gameStarted = true;
                 betButtons.forEach(button => {
+                    button.disabled = true;
+                });
+                numberButtons.forEach(button => { // Disable number buttons
                     button.disabled = true;
                 });
                 rollButton.textContent = "Roll Again";
             }
 
-            const userGuess = parseInt(numberInput.value);
-            const result = Math.floor(Math.random() * 10) + 1;
-            diceResult.textContent = `${result}`;
+            const userGuess = chosenNumber; // Use the chosen number
+            const currentRoll = Math.floor(Math.random() * 5) + 1;
+            diceResult.textContent = `${currentRoll}`;
 
-            if (result === targetNumber && userGuess === targetNumber) {
+            currentRolls.push(currentRoll);
+            userGuesses.push(userGuess);
+
+            if (currentRoll === targetNumber && userGuess === targetNumber) {
                 modalTitle.textContent = "Congratulations!";
-                modalText.textContent = `You guessed correctly and won ${selectedBet * 2} SST!`;
+                modalText.textContent = `You guessed correctly and won ${selectedBet * 2} SST!  The target number was ${targetNumber}. Your guess was ${userGuess}.`;
                 modal.style.display = "block";
                 rollButton.disabled = true;
                 resetGame();
@@ -282,7 +342,9 @@
                 gameMessage.textContent = `Incorrect guess. Attempts left: ${attemptsLeft}`;
                 if (attemptsLeft === 0) {
                     modalTitle.textContent = "Game Over!";
-                    modalText.textContent = `You lost. The correct number was ${targetNumber}.`;
+                    modalText.textContent = `You lost!  
+                    Dice: ${currentRolls[0]}.  You: ${userGuesses[0]}
+                    The target number was ${targetNumber}.`;
                     modal.style.display = "block";
                     rollButton.disabled = true;
                     resetGame();
@@ -292,7 +354,7 @@
 
         howToPlayLink.addEventListener('click', function(event) {
             event.preventDefault();
-            alert("How to Play:\n\n1. Choose a bet amount.\n2. Guess a number between 1 and 10.\n3. Roll the dice.\n4. If the dice roll matches your guess AND the randomly generated number, you win twice your bet.\n5. You have 2 attempts to guess correctly.");
+            alert("How to Play:\n\n1. Choose a bet amount.\n2. Choose a number between 1 and 5.\n3. Roll the dice.\n4. If the dice roll matches your guess AND the randomly generated number, you win twice your bet.\n5. You have 1 attempt to guess correctly.");
         });
 
         modalButton.addEventListener('click', function() {
@@ -301,14 +363,21 @@
 
         function resetGame() {
             setTimeout(() => {
-                attemptsLeft = 2;
+                attemptsLeft = 1;
                 targetNumber = null;
                 selectedBet = 0;
                 gameStarted = false;
+                currentRolls = [];
+                userGuesses = [];
+                chosenNumber = 0; // Reset chosen number
                 diceResult.textContent = "Roll the dice!";
                 gameMessage.textContent = "";
                 numberInput.value = "";
                 betButtons.forEach(button => {
+                    button.disabled = false;
+                    button.classList.remove('selected');
+                });
+                numberButtons.forEach(button => { // Enable number buttons
                     button.disabled = false;
                     button.classList.remove('selected');
                 });
