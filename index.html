@@ -16,6 +16,7 @@
             color: #fff;
             margin: 0;
             padding: 20px;
+            position: relative;
         }
 
         .game-container {
@@ -112,7 +113,7 @@
             color: #fff;
             margin-top: 10px;
             font-size: 16px;
-            display: none; /* Hide the input field */
+            display: none;
         }
 
         .number-buttons {
@@ -223,7 +224,9 @@
         }
 
         #connect-wallet {
-            margin-top: 20px;
+            position: absolute;
+            top: 20px;
+            right: 20px;
             padding: 12px 25px;
             font-size: 18px;
             background-color: #4CAF50;
@@ -239,8 +242,28 @@
             background-color: #45a049;
         }
 
+        #disconnect-wallet {
+            position: absolute;
+            top: 20px;
+            right: 150px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        #disconnect-wallet:hover {
+            background-color: #d32f2f;
+        }
+
         #network-info {
-            display: none; /* Hide the network info section by default */
+            display: none;
             margin-top: 20px;
             text-align: left;
             padding: 15px;
@@ -303,6 +326,7 @@
         </div>
         <p id="game-message" class="message"></p>
         <button id="connect-wallet">Connect Wallet</button>
+        <button id="disconnect-wallet">Disconnect</button>
     </div>
 
     <div id="result-modal" class="modal">
@@ -336,6 +360,7 @@
         const modalText = document.getElementById('modal-text');
         const modalButton = document.getElementById('modal-button');
         const connectWalletButton = document.getElementById('connect-wallet');
+        const disconnectWalletButton = document.getElementById('disconnect-wallet');
         const networkInfo = document.getElementById('network-info');
 
         let attemptsLeft = 1;
@@ -345,10 +370,21 @@
         let currentRolls = [];
         let userGuesses = [];
         let chosenNumber = 0;
+        let walletConnected = false;
+
+        // Disable game buttons initially
+        betButtons.forEach(button => {
+            button.disabled = true;
+        });
+        numberButtons.forEach(button => {
+            button.disabled = true;
+        });
+        rollButton.disabled = true;
+        disconnectWalletButton.style.display = 'none';
 
         betButtons.forEach(button => {
             button.addEventListener('click', function() {
-                if (!gameStarted) {
+                if (walletConnected && !gameStarted) {
                     selectedBet = parseFloat(this.dataset.bet);
                     betButtons.forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
@@ -358,7 +394,7 @@
 
         numberButtons.forEach(button => {
             button.addEventListener('click', function() {
-                if (!gameStarted) {
+                if (walletConnected && !gameStarted) {
                     chosenNumber = parseInt(this.dataset.number);
                     numberButtons.forEach(b => b.classList.remove('selected'));
                     this.classList.add('selected');
@@ -368,6 +404,10 @@
         });
 
         rollButton.addEventListener('click', function() {
+            if (!walletConnected) {
+                gameMessage.textContent = "Please connect your wallet to play.";
+                return;
+            }
             if (selectedBet === 0) {
                 gameMessage.textContent = "Please select a bet amount.";
                 return;
@@ -397,6 +437,10 @@
             currentRolls.push(currentRoll);
             userGuesses.push(userGuess);
 
+            // Simulate transaction and fee payment
+            console.log(`Simulating transaction on Somnia Testnet for ${selectedBet} SST...`);
+            console.log("Simulating fee payment...");
+
             if (currentRoll === targetNumber && userGuess === targetNumber) {
                 modalTitle.textContent = "Congratulations!";
                 modalText.textContent = `You guessed correctly and won ${selectedBet * 2} SST!  The target number was ${targetNumber}. Your guess was ${userGuess}.`;
@@ -420,7 +464,7 @@
 
         howToPlayLink.addEventListener('click', function(event) {
             event.preventDefault();
-            alert("How to Play:\n\n1. Choose a bet amount.\n2. Choose a number between 1 and 5.\n3. Roll the dice.\n4. If the dice roll matches your guess AND the randomly generated number, you win twice your bet.\n5. You have 1 attempt to guess correctly.");
+            alert("How to Play:\n\n1. Connect your wallet to the Somnia Testnet Network.\n2. Choose a bet amount.\n3. Choose a number between 1 and 5.\n4. Roll the dice.\n5. If the dice roll matches your guess AND the randomly generated number, you win twice your bet.\n6. You have 1 attempt to guess correctly.");
         });
 
         modalButton.addEventListener('click', function() {
@@ -440,20 +484,49 @@
                 gameMessage.textContent = "";
                 numberInput.value = "";
                 betButtons.forEach(button => {
-                    button.disabled = false;
+                    button.disabled = !walletConnected;
                     button.classList.remove('selected');
                 });
                 numberButtons.forEach(button => {
-                    button.disabled = false;
+                    button.disabled = !walletConnected;
                     button.classList.remove('selected');
                 });
-                rollButton.disabled = false;
+                rollButton.disabled = !walletConnected;
                 rollButton.textContent = "Roll Dice";
             }, 3000);
         }
 
         connectWalletButton.addEventListener('click', function() {
-            alert("Connect your wallet to the Somnia Testnet Network to play!");
+            // Simulate connecting to a wallet and Somnia Testnet
+            console.log("Connecting to wallet and Somnia Testnet...");
+            walletConnected = true; // For demo purposes, set to true
+            gameMessage.textContent = "Wallet connected! You can now play.";
+            // Enable game buttons after connecting wallet
+            betButtons.forEach(button => {
+                button.disabled = false;
+            });
+            numberButtons.forEach(button => {
+                button.disabled = false;
+            });
+            rollButton.disabled = false;
+            connectWalletButton.style.display = 'none';
+            disconnectWalletButton.style.display = 'inline-block';
+        });
+
+        disconnectWalletButton.addEventListener('click', function() {
+            console.log("Disconnecting Wallet");
+            walletConnected = false;
+            gameMessage.textContent = "Wallet disconnected! Connect to play.";
+             betButtons.forEach(button => {
+                button.disabled = true;
+            });
+            numberButtons.forEach(button => {
+                button.disabled = true;
+            });
+            rollButton.disabled = true;
+            connectWalletButton.style.display = 'inline-block';
+            disconnectWalletButton.style.display = 'none';
+            resetGame();
         });
     </script>
 </body>
