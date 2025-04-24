@@ -1,22 +1,350 @@
-nav {
+body {
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #1a1a1a;
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+    position: relative;
+}
+
+.game-container {
+    text-align: center;
+    background-color: #2d2d2d;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    width: 350px;
+}
+
+#dice-result {
+    font-size: 3em;
+    margin-bottom: 20px;
+    color: #ff751a;
+    min-height: 40px;
+    font-weight: bold;
+}
+
+button {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #ff751a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+button:hover {
+    background-color: #e65100;
+}
+
+button:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.bet-buttons {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-nav button {
-    padding: 10px 20px;
-    margin: 0 5px;
+.bet-button {
+    padding: 10px 18px;
+    font-size: 16px;
+    background-color: #3b3b3b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    background-color: #f0f0f0; /* Default button background */
-    border: 1px solid #ccc;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+    box-shadow: none;
 }
 
-nav button.active {
-    background-color: #e0e0e0; /* Active button background */
-    font-weight: bold; /* Optional: Make active tab text bold */
+.bet-button:hover {
+    background-color: #4a4a4a;
 }
 
-.tab-content {
+.bet-button.selected {
+    background-color: #ff751a;
+    color: #fff;
+    box-shadow: 0 0 5px #fff;
+}
+
+.bet-button:disabled {
+    background-color: #888;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#number-input {
+    padding: 10px;
+    width: 120px;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background-color: #222;
+    color: #fff;
+    margin-top: 10px;
+    font-size: 16px;
+    display: none;
+}
+
+.number-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    gap: 5px;
+}
+
+.number-button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #3b3b3b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 5px;
+    transition: background-color 0.3s ease;
+    box-shadow: none;
+}
+
+.number-button:hover {
+    background-color: #4a4a4a;
+}
+
+.number-button.selected {
+    background-color: #ff751a;
+    color: #fff;
+    box-shadow: 0 0 5px #fff;
+}
+
+.message {
+    font-size: 1.4em;
+    color: #fff;
+    margin-bottom: 20px;
+    min-height: 30px;
+    font-weight: bold;
+}
+
+.label {
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #aaa;
+}
+
+#how-to-play {
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: #888;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #2d2d2d;
+    color: #fff;
+    margin: 15% auto;
     padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.modal-title {
+    font-size: 2em;
+    color: #ff751a;
+    margin-bottom: 15px;
+}
+
+.modal-text {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.modal-button {
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #ff751a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.modal-button:hover {
+    background-color: #e65100;
+}
+
+#connect-wallet {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#connect-wallet:hover {
+    background-color: #45a049;
+}
+
+#disconnect-wallet {
+    position: absolute;
+    top: 20px;
+    right: 150px;
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    display: none;
+}
+
+#disconnect-wallet:hover {
+    background-color: #d32f2f;
+}
+
+#network-info {
+    display: none;
+    margin-top: 20px;
+    text-align: left;
+    padding: 15px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    background-color: #222;
+    width: 90%;
+    max-width: 400px;
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+#network-info h3 {
+    font-size: 1.2em;
+    color: #ff751a;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#network-info p {
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+#network-info a {
+    color: #42a5f5;
+    text-decoration: none;
+}
+
+#network-info a:hover {
+    text-decoration: underline;
+}
+
+/* Custom styles for the wallet selection modal */
+.wallet-modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+    justify-content: center;
+    align-items: center;
+}
+
+.wallet-modal-content {
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+}
+
+.wallet-modal-title {
+    font-size: 1.5em;
+    color: #ff751a;
+    margin-bottom: 15px;
+}
+
+.wallet-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #3b3b3b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+    box-shadow: none;
+    width: 100%;
+    text-align: center;
+}
+
+.wallet-button:hover {
+    background-color: #4a4a4a;
+}
+
+.wallet-button img {
+    margin-right: 10px;
+    height: 24px;
+    width: 24px;
+    vertical-align: middle;
 }
